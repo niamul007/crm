@@ -61,3 +61,33 @@ export const updateClient = async(update) =>{
   const result = await pool.query(sql, [name, email, phone, company, project_name, project_status, deadline, budget, id, user_id]);
   return result.rows[0];
 }
+
+export const addPayments = async (clientId, userId, amount, payment_note, payment_date) => {
+  const sql = `
+  INSERT INTO payments (client_id, user_id, amount, note, exact_date)
+  VALUES ($1, $2, $3, $4, $5)
+  RETURNING *
+  `
+  const result = await pool.query(sql, [clientId, userId, amount, payment_note, payment_date]);
+  return result.rows[0];
+}
+
+export const deletePayment = async (paymentId, userId) => {
+  const sql = `
+    DELETE FROM payments
+    WHERE id = $1 AND user_id = $2
+    RETURNING *
+  `
+  const result = await pool.query(sql, [paymentId, userId]);
+  return result.rowCount > 0;
+}
+
+  // CREATE TABLE IF NOT EXISTS payments(
+  //   id SERIAL PRIMARY KEY,
+  //   user_id INTEGER REFERENCES users(id),
+  //   client_id INTEGER REFERENCES clients(id),
+  //   amount DECIMAL NOT NULL,
+  //   note VARCHAR(400),
+  //   exact_date DATE NOT NULL,
+  //   created_at TIMESTAMP DEFAULT NOW()
+  // )
