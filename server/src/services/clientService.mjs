@@ -51,10 +51,8 @@ export const deleteClient = async (clientId, userId) => {
   return result.rowCount > 0;
 };
 
-export const updateClient = async (update) => {
+export const updateClient = async (id, user_id, update) => {
   const {
-    id,
-    user_id,
     name,
     email,
     phone,
