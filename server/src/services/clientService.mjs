@@ -39,3 +39,13 @@ export const createClient = async (
   ]);
   return resutl.rows[0];
 };
+
+export const deleteClient = async (clientId, userId) => {
+  const sql = `
+    DELETE FROM clients
+    WHERE id = $1 AND user_id = $2
+    RETURNING *
+    `
+  const result = await pool.query(sql, [clientId, userId]);
+  return result.rowCount > 0;
+}
