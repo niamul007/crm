@@ -49,3 +49,15 @@ export const deleteClient = async (clientId, userId) => {
   const result = await pool.query(sql, [clientId, userId]);
   return result.rowCount > 0;
 }
+
+export const updateClient = async(update) =>{
+  const {id, user_id, name, email, phone, company, project_name, project_status, deadline, budget} = update;
+  const sql = `
+    UPDATE clients
+    SET name = $1, email = $2, phone = $3, company = $4, project_name = $5, project_status = $6, deadline = $7, budget = $8
+    WHERE id = $9 AND user_id = $10
+    RETURNING *
+  `
+  const result = await pool.query(sql, [name, email, phone, company, project_name, project_status, deadline, budget, id, user_id]);
+  return result.rows[0];
+}
