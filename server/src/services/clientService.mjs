@@ -138,10 +138,70 @@ WHERE id = $1 AND user_id = $2
   return result.rowCount > 0;
 };
 
-// CREATE TABLE IF NOT EXISTS notes (
-//     id SERIAL PRIMARY KEY,
-//     user_id INTEGER REFERENCES users(id),
-//     client_id INTEGER REFERENCES clients(id),
-//     content VARCHAR(400) NOT NULL,
-//     created_at TIMESTAMP DEFAULT NOW()
-// )
+export const getClientById = async (clientId, userId) => {
+  const sql = `
+  SELECT 
+  clients.id AS client_id,
+  clients.name,
+  clients.email,
+  clients.phone,
+  clients.company,
+  clients.project_name,
+  clients.project_status,
+  clients.deadline,
+  clients.budget,
+  clients.created_at AS client_created_at,
+  payments.id AS payment_id,
+  payments.amount,
+  payments.note AS payment_note,
+  payments.exact_date,
+  notes.id AS note_id,
+  notes.content,
+  notes.created_at AS note_created_at
+FROM clients
+LEFT JOIN payments ON clients.id = payments.client_id
+LEFT JOIN notes ON clients.id = notes.client_id
+WHERE clients.id = $1 AND clients.user_id = $2
+  `;
+  const result = await pool.query(sql, [clientId, userId]);
+  if (result.rows.length === 0) {
+    return null;
+  }
+  return result.rows;
+};
+
+//strict
+
+// SELECT * FROM clients
+// INNER JOIN payments ON clients.id = payments.client_id
+// INNER JOIN notes ON clients.id = notes.client_id
+// WHERE clients.id = $1
+
+//easy
+// SELECT * FROM clients
+// LEFT JOIN payments ON clients.id = payments.client_id
+// LEFT JOIN notes ON clients.id = notes.client_id
+// WHERE clients.id = $1
+
+// SELECT
+//   clients.id AS client_id,
+//   clients.name,
+//   clients.email,
+//   clients.phone,
+//   clients.company,
+//   clients.project_name,
+//   clients.project_status,
+//   clients.deadline,
+//   clients.budget,
+//   clients.created_at AS client_created_at,
+//   payments.id AS payment_id,
+//   payments.amount,
+//   payments.note AS payment_note,
+//   payments.exact_date,
+//   notes.id AS note_id,
+//   notes.content,
+//   notes.created_at AS note_created_at
+// FROM clients
+// LEFT JOIN payments ON clients.id = payments.client_id
+// LEFT JOIN notes ON clients.id = notes.client_id
+// WHERE clients.id = $1 AND clients.user_id = $2
