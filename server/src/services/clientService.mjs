@@ -1,3 +1,4 @@
+import { use } from "react";
 import pool from "../db/index.js";
 
 export const getClient = async (userId) => {
@@ -45,49 +46,102 @@ export const deleteClient = async (clientId, userId) => {
     DELETE FROM clients
     WHERE id = $1 AND user_id = $2
     RETURNING *
-    `
+    `;
   const result = await pool.query(sql, [clientId, userId]);
   return result.rowCount > 0;
-}
+};
 
-export const updateClient = async(update) =>{
-  const {id, user_id, name, email, phone, company, project_name, project_status, deadline, budget} = update;
+export const updateClient = async (update) => {
+  const {
+    id,
+    user_id,
+    name,
+    email,
+    phone,
+    company,
+    project_name,
+    project_status,
+    deadline,
+    budget,
+  } = update;
   const sql = `
     UPDATE clients
     SET name = $1, email = $2, phone = $3, company = $4, project_name = $5, project_status = $6, deadline = $7, budget = $8
     WHERE id = $9 AND user_id = $10
     RETURNING *
-  `
-  const result = await pool.query(sql, [name, email, phone, company, project_name, project_status, deadline, budget, id, user_id]);
+  `;
+  const result = await pool.query(sql, [
+    name,
+    email,
+    phone,
+    company,
+    project_name,
+    project_status,
+    deadline,
+    budget,
+    id,
+    user_id,
+  ]);
   return result.rows[0];
-}
+};
 
-export const addPayments = async (clientId, userId, amount, payment_note, payment_date) => {
+export const addPayments = async (
+  clientId,
+  userId,
+  amount,
+  payment_note,
+  payment_date,
+) => {
   const sql = `
   INSERT INTO payments (client_id, user_id, amount, note, exact_date)
   VALUES ($1, $2, $3, $4, $5)
   RETURNING *
-  `
-  const result = await pool.query(sql, [clientId, userId, amount, payment_note, payment_date]);
+  `;
+  const result = await pool.query(sql, [
+    clientId,
+    userId,
+    amount,
+    payment_note,
+    payment_date,
+  ]);
   return result.rows[0];
-}
+};
 
 export const deletePayment = async (paymentId, userId) => {
   const sql = `
     DELETE FROM payments
     WHERE id = $1 AND user_id = $2
     RETURNING *
-  `
+  `;
   const result = await pool.query(sql, [paymentId, userId]);
   return result.rowCount > 0;
-}
+};
 
-  // CREATE TABLE IF NOT EXISTS payments(
-  //   id SERIAL PRIMARY KEY,
-  //   user_id INTEGER REFERENCES users(id),
-  //   client_id INTEGER REFERENCES clients(id),
-  //   amount DECIMAL NOT NULL,
-  //   note VARCHAR(400),
-  //   exact_date DATE NOT NULL,
-  //   created_at TIMESTAMP DEFAULT NOW()
-  // )
+export const addNote = async (clientId, userId, content) => {
+  const sql = `
+  INSERT INTO notes (client_id, user_id, content)
+  VALUES ($1, $2, $3)
+  RETURNING *
+  `;
+  const result = await pool.query(sql, [clientId, userId, content]);
+  return result.rows[0];
+};
+
+export const deleteNote = async (nodeId, userId) => {
+  const sql = `
+  DELETE FROM notes 
+WHERE id = $1 AND user_id = $2
+  RETURNING *
+  `;
+
+  const result = await pool.query(sql, [nodeId, userId]);
+  return result.rowCount > 0;
+};
+
+// CREATE TABLE IF NOT EXISTS notes (
+//     id SERIAL PRIMARY KEY,
+//     user_id INTEGER REFERENCES users(id),
+//     client_id INTEGER REFERENCES clients(id),
+//     content VARCHAR(400) NOT NULL,
+//     created_at TIMESTAMP DEFAULT NOW()
+// )
