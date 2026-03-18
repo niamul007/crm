@@ -1,4 +1,3 @@
-import { use } from "react";
 import * as clientService from "../services/clientService.mjs";
 
 export const getClient = async (req, res) => {
@@ -130,13 +129,40 @@ export const addPayments = async (req, res) => {
   }
 };
 
-export const deletePayment = async (req, res) => {
+export const deletePayments = async (req, res) => {
   try {
     const paymentId = req.params.pid;
     const userId = req.user.id;
     await clientService.deletePayment(paymentId, userId);
     res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
 
+export const addNote = async (req, res) => {
+  try {
+    const clientId = req.params.id;
+    const userId = req.user.id;
+    const content = req.body.content;
+
+    const client = await clientService.addNote(clientId, userId, content);
+    res.status(201).json({
+      status: " success",
+      data: { client },
+    });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const deleteNote = async (req, res) => {
+  try {
+    const noteId = req.params.nid;
+    const userId = req.user.id;
+
+    await clientService.deleteNote(noteId, userId);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
   }
