@@ -107,3 +107,37 @@ export const deleteClient = async (req, res) => {
     res.status(500).json({ status: "error", message: error.message });
   }
 };
+
+export const addPayments = async (req, res) => {
+  try {
+    const clientId = req.params.id;
+    const userId = req.user.id;
+    const { amount, payment_note, payment_date } = req.body;
+
+    const client = await clientService.addPayments(
+      clientId,
+      userId,
+      amount,
+      payment_note,
+      payment_date,
+    );
+    res.status(201).json({
+      status: "success",
+      data: { client },
+    });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const deletePayment = async (req, res) => {
+  try {
+    const paymentId = req.params.pid;
+    const userId = req.user.id;
+    await clientService.deletePayment(paymentId, userId);
+    res.status(204).send();
+
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
