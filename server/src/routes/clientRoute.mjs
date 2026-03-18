@@ -1,0 +1,13 @@
+import express from 'express';
+const router = express.Router();
+import * as clientController from "../controllers/clientController.mjs";
+
+router.get("/", clientController.getClient);
+router.post("/", clientController.createClient);
+router.get("/:id", clientController.getClientById);
+router.delete("/:id", clientController.deleteClient);
+router.put("/:id", clientController.updateClient);
+router.post("/:id/payments", clientController.addPayments);
+router.delete("/:id/payments/:pid", clientController.deletePayments)
+router.post("/:id/notes",clientController.addNote);
+router.delete("/:id/notes/:nid", clientController.deleteNote)
