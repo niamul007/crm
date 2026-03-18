@@ -11,3 +11,5 @@ router.post("/:id/payments", clientController.addPayments);
 router.delete("/:id/payments/:pid", clientController.deletePayments)
 router.post("/:id/notes",clientController.addNote);
 router.delete("/:id/notes/:nid", clientController.deleteNote)
+
+export default router;
