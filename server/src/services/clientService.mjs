@@ -1,4 +1,3 @@
-import { use } from "react";
 import pool from "../db/index.js";
 
 export const getClient = async (userId) => {
@@ -125,14 +124,14 @@ export const addNote = async (clientId, userId, content) => {
   return result.rows[0];
 };
 
-export const deleteNote = async (nodeId, userId) => {
+export const deleteNote = async (noteId, userId) => {
   const sql = `
   DELETE FROM notes 
 WHERE id = $1 AND user_id = $2
   RETURNING *
   `;
 
-  const result = await pool.query(sql, [nodeId, userId]);
+  const result = await pool.query(sql, [noteId, userId]);
   return result.rowCount > 0;
 };
 
