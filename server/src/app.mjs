@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import clientRoutes from "./routes/clientRoute.mjs";
+import authRoutes from "./routes/auth.mjs";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -21,8 +22,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 const PORT = process.env.PORT || 5000;
 app.use("/api/clients", clientRoutes); // Prefix all client routes with /api/clients
-// import authRoutes from "./routes/auth.mjs";
-// app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World! here is the backend server of CRM");
