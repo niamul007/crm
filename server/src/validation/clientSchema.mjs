@@ -17,3 +17,20 @@ export const clientSchema = z.object({
     budget: z.number().positive(),
   }),
 });
+
+export const paymentSchema = z.object({
+  body: z.object({
+    amount: z.number().positive(),
+    payment_date: z.string().date("Must be valid date"),
+    payment_note: z
+      .string()
+      .min(5, { message: "more than 5 char needed" })
+      .optional(),
+  }),
+});
+
+export const noteSchema = z.object({
+  body: z.object({
+    content: z.string().min(5, { message: "more than 5 char needed" }),
+  }),
+});
