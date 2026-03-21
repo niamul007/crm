@@ -3,6 +3,7 @@ import cors from "cors";
 import clientRoutes from "./routes/clientRoute.mjs";
 import authRoutes from "./routes/auth.mjs";
 import dotenv from "dotenv";
+import  globalErrorHnadler  from "./middleware/errorMiddleware.mjs";
 dotenv.config();
 
 const app = express();
@@ -33,6 +34,8 @@ app.get("/health", (req, res) => {
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
+
+app.use(globalErrorHnadler);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}, http://localhost:${PORT}`);
 });
