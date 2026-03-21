@@ -1,7 +1,9 @@
 import express from 'express';
+import { protect } from '../middleware/authMiddleware.mjs'
 const router = express.Router();
 import * as clientController from "../controllers/clientController.mjs";
 
+router.use(protect)
 router.get("/", clientController.getClient);
 router.post("/", clientController.createClient);
 router.get("/:id", clientController.getClientById);
