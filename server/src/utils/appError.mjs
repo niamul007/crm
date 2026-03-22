@@ -1,47 +1,35 @@
+// ─── UTILS/APPERROR.MJS ──────────────────────────────────────────
+/**
+ * APPERROR.MJS — CUSTOM ERROR CLASS
+ * -----------------------------------
+ * Extends built-in Error to include a statusCode.
+ * Lets you create descriptive errors anywhere in the app.
+ * 
+ * USAGE:
+ *   throw new AppError("Client not found", 404)
+ *   next(new AppError("Unauthorized", 401))
+ * 
+ * PROPERTIES:
+ *   message        → error description (from Error)
+ *   statusCode     → HTTP status code (404, 401, 500...)
+ *   status         → "fail" for 4xx, "error" for 5xx
+ *   isOperational  → true = expected error we created
+ *                    helps separate our errors from crashes
+ * 
+ * WHY startsWith("4")?
+ *   4xx errors are client mistakes → "fail"
+ *   5xx errors are server mistakes → "error"
+ */
 
 class AppError extends Error {
   constructor(message, statusCode) {
-    super(message);
+    super(message); // sets this.message
     this.statusCode = statusCode;
     this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
     this.isOperational = true;
+    // Removes AppError itself from the stack trace — cleaner debugging
     Error.captureStackTrace(this, this.constructor);
   }
 }
 
 export default AppError;
-
-
-// APPERROR CLASS — HOW IT WORKS
-// ------------------------------
-// AppError extends the built-in Error class.
-// This lets us create errors with a message AND 
-// a status code in one shot.
-
-// Instead of:
-//   res.status(404).json({ message: "Not found" })
-
-// We can do anywhere in the app:
-//   throw new AppError("Not found", 404)
-//   next(new AppError("Not found", 404))
-
-// WHAT EACH LINE DOES:
-//   super(message)        
-//     → calls Error constructor, sets error message
-
-//   this.statusCode       
-//     → stores the HTTP status code (404, 401, 500)
-
-//   this.status           
-//     → "fail" for 4xx errors (client's fault)
-//     → "error" for 5xx errors (server's fault)
-
-//   this.isOperational    
-//     → marks this as an expected error we created
-//     → helps separate our errors from unexpected 
-//       crashes in the global error handler
-
-//   Error.captureStackTrace
-//     → cleans up the error stack trace
-//     → removes AppError itself from the trace
-//     → makes debugging easier
