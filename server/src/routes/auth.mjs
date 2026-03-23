@@ -18,5 +18,6 @@ import { registerSchema, loginSchema } from '../validation/authValidation.mjs';
 
 router.post("/register", validateSchema(registerSchema), authController.register);
 router.post("/login", validateSchema(loginSchema), authController.login);
+router.get("/me", protect, authController.getMe);
 
 export default router;
