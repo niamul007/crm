@@ -145,3 +145,9 @@ export const deleteNote = catchAsync(async (req, res) => {
   res.status(204).send();
 });
 
+export const getMe = catchAsync(async (req, res) => {
+  res.status(200).json({
+    status: "success",
+    data: { user: req.user }
+  });
+});
