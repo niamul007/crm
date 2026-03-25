@@ -108,7 +108,25 @@ export default function ClientDetail() {
   };
 
   // YOU WRITE THIS — add note
-  const handleAddNote = async () => {};
+  const handleAddNote = async () => {
+    if (!id) {
+      setLoading(false);
+      throw new Error("Id isn't valid");
+    }
+    setLoading(true);
+    try {
+      await API.post(`/api/clients/${id}/notes`, { content: noteContent });
+      const updated = await API.get(`/api/clients/${id}`);
+      setClient(formatClientData(updated.data?.data?.getClients));
+      setNoteContent("");
+      console.log("ID from params:", id);
+    } catch (error) {
+      console.error(error.message);
+      console.log("PAYMENT ERROR:", error.response?.data);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // YOU WRITE THIS — delete payment
   const handleDeletePayment = async (paymentId) => {};
