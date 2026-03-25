@@ -12,34 +12,36 @@ export default function Dashboard() {
 
   // YOU WRITE THIS
   useEffect(() => {
-    const fetchClient = async () =>{
-        if(!user?.id){
-          setLoading(false)
-          return;
-        }
-        setLoading(true);
+    const fetchClient = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
 
-        try{
-          const res = await API.get("/api/clients");
-          setClients(res.data?.data?.clients);
-        }catch(error){
-          console.log("failed to fetch",error)
-        }finally{
-          setLoading(false)
-        }
-    }
+      try {
+        const res = await API.get("/api/clients");
+        console.log(res.data);
+        setClients(res.data?.data?.clients || []);
+      } catch (error) {
+        console.log("failed to fetch", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchClient();
-
   }, [user?.id]);
 
   // YOU WRITE THIS
   const handleLogout = () => {
     logout();
-    navigate("/login")
+    navigate("/login");
   };
 
   const totalBudget = clients.reduce((sum, c) => sum + parseFloat(c.budget), 0);
-  const activeProjects = clients.filter(c => c.project_status === "in-progress").length;
+  const activeProjects = clients.filter(
+    (c) => c.project_status === "in-progress",
+  ).length;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -47,7 +49,9 @@ export default function Dashboard() {
       <nav className="border-b border-slate-800 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-white">Client Tracker</h1>
         <div className="flex items-center gap-4">
-          <span className="text-slate-400 text-sm">Hey, {user?.username} 👋</span>
+          <span className="text-slate-400 text-sm">
+            Hey, {user?.username} 👋
+          </span>
           <button
             onClick={handleLogout}
             className="text-sm text-slate-400 hover:text-white transition"
@@ -61,16 +65,24 @@ export default function Dashboard() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-            <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Total Clients</p>
+            <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">
+              Total Clients
+            </p>
             <p className="text-3xl font-bold text-white">{clients.length}</p>
           </div>
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-            <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Active Projects</p>
+            <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">
+              Active Projects
+            </p>
             <p className="text-3xl font-bold text-blue-400">{activeProjects}</p>
           </div>
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-            <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Total Budget</p>
-            <p className="text-3xl font-bold text-green-400">${totalBudget.toLocaleString()}</p>
+            <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">
+              Total Budget
+            </p>
+            <p className="text-3xl font-bold text-green-400">
+              ${totalBudget.toLocaleString()}
+            </p>
           </div>
         </div>
 
