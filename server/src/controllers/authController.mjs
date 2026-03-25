@@ -115,3 +115,10 @@ export const login = catchAsync(async (req, res) => {
     },
   });
 });
+
+export const getMe = catchAsync(async (req, res) => {
+  res.status(200).json({
+    status: "success",
+    data: { user: req.user },
+  });
+});

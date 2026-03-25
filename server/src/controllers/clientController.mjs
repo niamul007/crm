@@ -4,18 +4,18 @@
  * Handles all HTTP requests for clients, payments and notes.
  * Extracts data from req.user, req.params, req.body
  * then calls the appropriate service function.
- * 
+ *
  * DATA SOURCES — where each piece of data comes from:
  *   req.user.id    → from JWT token via authMiddleware
  *   req.params.id  → from URL e.g. /clients/5
  *   req.params.pid → from URL e.g. /clients/5/payments/3
  *   req.params.nid → from URL e.g. /clients/5/notes/2
  *   req.body       → from frontend request body
- * 
+ *
  * CATCHASYNC
  * Wraps every function — no try/catch needed.
  * Any error automatically goes to globalErrorHandler.
- * 
+ *
  * STATUS CODES
  *   200 → success, returning data
  *   201 → success, something new created
@@ -42,11 +42,28 @@ export const getClient = catchAsync(async (req, res) => {
  * userId comes from JWT token — frontend never sends userId directly
  */
 export const createClient = catchAsync(async (req, res) => {
+  console.log("REQ BODY:", req.body);
   const userId = req.user.id;
-  const { name, email, phone, company, project_name, project_status, deadline, budget } = req.body;
+  const {
+    name,
+    email,
+    phone,
+    company,
+    project_name,
+    project_status,
+    deadline,
+    budget,
+  } = req.body;
   const clients = await clientService.createClient(
-    userId, name, email, phone, company,
-    project_name, project_status, deadline, budget
+    userId,
+    name,
+    email,
+    phone,
+    company,
+    project_name,
+    project_status,
+    deadline,
+    budget,
   );
   res.status(201).json({ status: "success", data: { clients } });
 });
@@ -55,7 +72,7 @@ export const createClient = catchAsync(async (req, res) => {
  * GETCLIENTBYID — GET /api/clients/:id
  * clientId comes from URL params
  * userId comes from JWT token
- * Service returns multiple rows (JOIN query) — 
+ * Service returns multiple rows (JOIN query) —
  * TODO: reshape rows into single object with payments[] and notes[]
  */
 export const getClientById = catchAsync(async (req, res) => {
@@ -74,10 +91,25 @@ export const getClientById = catchAsync(async (req, res) => {
 export const updateClient = catchAsync(async (req, res) => {
   const id = req.params.id;
   const userId = req.user.id;
-  const { name, email, phone, company, project_name, project_status, deadline, budget } = req.body;
+  const {
+    name,
+    email,
+    phone,
+    company,
+    project_name,
+    project_status,
+    deadline,
+    budget,
+  } = req.body;
   const clients = await clientService.updateClient(id, userId, {
-    name, email, phone, company,
-    project_name, project_status, deadline, budget
+    name,
+    email,
+    phone,
+    company,
+    project_name,
+    project_status,
+    deadline,
+    budget,
   });
   res.status(200).json({ status: "success", data: { clients } });
 });
@@ -105,7 +137,11 @@ export const addPayments = catchAsync(async (req, res) => {
   const userId = req.user.id;
   const { amount, payment_note, payment_date } = req.body;
   const client = await clientService.addPayments(
-    clientId, userId, amount, payment_note, payment_date
+    clientId,
+    userId,
+    amount,
+    payment_note,
+    payment_date,
   );
   res.status(201).json({ status: "success", data: { client } });
 });
@@ -145,9 +181,3 @@ export const deleteNote = catchAsync(async (req, res) => {
   res.status(204).send();
 });
 
-export const getMe = catchAsync(async (req, res) => {
-  res.status(200).json({
-    status: "success",
-    data: { user: req.user }
-  });
-});
