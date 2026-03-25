@@ -29,12 +29,9 @@ export const clientSchema = z.object({
 // payment_note is optional — user may not always add a note
 export const paymentSchema = z.object({
   body: z.object({
-    amount: z.number().positive(),
+    amount: z.coerce.number().positive(),
     payment_date: z.string().date("Must be valid date"),
-    payment_note: z
-      .string()
-      .min(5, { message: "more than 5 chars" })
-      .optional(),
+    payment_note: z.string().min(5).optional().or(z.literal("")),
   }),
 });
 
