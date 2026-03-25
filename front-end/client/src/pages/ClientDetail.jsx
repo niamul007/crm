@@ -81,7 +81,31 @@ export default function ClientDetail() {
   }, [id]);
 
   // YOU WRITE THIS — add payment
-  const handleAddPayment = async () => {};
+  const handleAddPayment = async () => {
+    if (!id) {
+      setLoading(false);
+      throw new Error("Id isn't avaible");
+    }
+    setLoading(true);
+    try {
+      await API.post(`/api/clients/${id}/payments`, {
+        amount: paymentAmount,
+        payment_date: paymentDate,
+        payment_note: paymentNote,
+      });
+      // re-fetch full client
+      const updated = await API.get(`/api/clients/${id}`);
+      setClient(formatClientData(updated.data?.data?.getClients));
+      setPaymentAmount("");
+      setPaymentDate("");
+      setPaymentNote("");
+    } catch (error) {
+      console.error(error.message);
+      console.log("PAYMENT ERROR:", error.response?.data);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // YOU WRITE THIS — add note
   const handleAddNote = async () => {};
