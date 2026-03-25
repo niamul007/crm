@@ -129,10 +129,40 @@ export default function ClientDetail() {
   };
 
   // YOU WRITE THIS — delete payment
-  const handleDeletePayment = async (paymentId) => {};
+  const handleDeletePayment = async (paymentId) => {
+    if (!paymentId) {
+      setLoading(false);
+      throw new Error("Id isn't valid");
+    }
+    setLoading(true);
+    try {
+      await API.delete(`/api/clients/${id}/payments/${paymentId}`);
+      const updated = await API.get(`/api/clients/${id}`);
+      setClient(formatClientData(updated.data?.data?.getClients));
+    } catch (error) {
+      console.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // YOU WRITE THIS — delete note
-  const handleDeleteNote = async (noteId) => {};
+  const handleDeleteNote = async (noteId) => {
+    if (!noteId) {
+      setLoading(false);
+      throw new Error("Id isn't valid");
+    }
+    setLoading(true);
+    try {
+      await API.delete(`/api/clients/${id}/notes/${noteId}`);
+      const updated = await API.get(`/api/clients/${id}`);
+      setClient(formatClientData(updated.data?.data?.getClients));
+    } catch (error) {
+      console.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const totalReceived =
     client?.payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
