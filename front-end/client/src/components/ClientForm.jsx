@@ -1,12 +1,15 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
 import API from "../api/axios";
 
 export default function ClientForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const editClient = location.state?.client;
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -32,21 +35,41 @@ export default function ClientForm() {
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  useEffect(() => {
+    if (editClient && !formData.name) {
+      setFormData({
+        name: editClient.name || "",
+        email: editClient.email || "",
+        phone: editClient.phone || "",
+        company: editClient.company || "",
+        project_name: editClient.project_name || "",
+        project_status: editClient.project_status || "pending",
+        deadline: editClient.deadline ? editClient.deadline.split("T")[0] : "",
+        budget: editClient.budget || "",
+      });
+    }
+  }, [editClient]);
+
   // YOU WRITE THIS
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
-  try {
-    const res = await API.post("/api/clients", formData);
-    navigate("/dashboard");
-  } catch (error) {
-    console.log("VALIDATION ERRORS:", error.response?.data);
-    setError(error.response?.data.message || "Failed");
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      if (editClient) {
+        await API.put(`/api/clients/${editClient.id}`, formData);
+      } else {
+        await API.post("/api/clients", formData);
+      }
+      navigate("/dashboard");
+
+    } catch (error) {
+      console.log("VALIDATION ERRORS:", error.response?.data);
+      setError(error.response?.data.message || "Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
