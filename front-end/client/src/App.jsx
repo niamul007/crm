@@ -1,4 +1,11 @@
-import { useState } from "react";
+/**
+ * App.jsx
+ * Root routing component.
+ * - Public routes: /login, /register
+ * - Protected routes: /dashboard, /clients/:id, /clients/new, /clients/:id/edit
+ * - ProtectedRoute wrapper checks JWT before rendering
+ * - Unknown routes redirect to /login
+ */
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -24,18 +31,18 @@ function App() {
           }
         />
         <Route
-          path="/clients/:id"
-          element={
-            <ProtectedRoute>
-              <ClientDetail />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/clients/new"
           element={
             <ProtectedRoute>
               <ClientForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/clients/:id"
+          element={
+            <ProtectedRoute>
+              <ClientDetail />
             </ProtectedRoute>
           }
         />
