@@ -43,6 +43,16 @@ export default function Dashboard() {
     (c) => c.project_status === "in-progress",
   ).length;
 
+  const onDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this client?")) return;
+    try {
+      await API.delete(`/api/clients/${id}`);
+      setClients(clients.filter((c) => c.id !== id));
+    } catch (error) {
+      console.log("Failed to delete client", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Navbar */}
@@ -108,7 +118,7 @@ export default function Dashboard() {
         ) : (
           <div className="grid gap-4">
             {clients.map((client) => (
-              <ClientCard key={client.id} client={client} />
+              <ClientCard key={client.id} client={client} onDelete={onDelete} />
             ))}
           </div>
         )}
