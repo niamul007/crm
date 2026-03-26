@@ -39,6 +39,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/clients/:id/edit"
+          element={
+            <ProtectedRoute>
+              <ClientForm />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
