@@ -1,3 +1,11 @@
+/**
+ * Login.jsx
+ * - Calls AuthContext login() with email + password
+ * - On success → redirects to /dashboard
+ * - On failure → shows error message from backend response
+ * - loading state disables button to prevent multiple submissions
+ */
+
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -10,7 +18,13 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+// how erro and loading reall help state is used to manage the user experience during the login process.
+//  When the user submits the login form, we set loading to true to indicate that the login process is in progress. 
+// This can be used to disable the login button and show a loading spinner, preventing multiple submissions and providing feedback to the user.
+// If the login attempt fails (e.g., due to incorrect credentials), we catch the error and set an appropriate error message in the error state. 
+// This message can then be displayed to the user, informing them of what went wrong and prompting them to correct their input.
   // YOU WRITE THIS FUNCTION
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -27,6 +41,10 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  // errr.response?.data.message is a way to safely access the error message returned by the backend API when a login attempt fails.
+  // The optional chaining operator (?.) is used to prevent runtime errors in case the error object or its nested properties are undefined. 
+  // If the backend returns an error response with a message, it will be displayed to the user. If not, a generic error message will be shown instead.
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
@@ -87,7 +105,7 @@ export default function Login() {
             Don't have an account?{" "}
             <Link to="/register" className="text-blue-400 hover:text-blue-300">
               Register
-            </Link>
+            </Link> 
           </p>
         </div>
       </div>
