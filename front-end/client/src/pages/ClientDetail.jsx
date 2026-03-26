@@ -110,7 +110,6 @@ export default function ClientDetail() {
   // YOU WRITE THIS — add note
   const handleAddNote = async () => {
     if (!id) {
-      setLoading(false);
       throw new Error("Id isn't valid");
     }
     setLoading(true);
@@ -131,7 +130,6 @@ export default function ClientDetail() {
   // YOU WRITE THIS — delete payment
   const handleDeletePayment = async (paymentId) => {
     if (!paymentId) {
-      setLoading(false);
       throw new Error("Id isn't valid");
     }
     setLoading(true);
@@ -163,7 +161,10 @@ export default function ClientDetail() {
       setLoading(false);
     }
   };
+  const handleEdit = ()=>{
+    navigate(`/clients/${id}/edit`,{ state: { client } });
 
+  }
   const totalReceived =
     client?.payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
   const remaining = parseFloat(client?.budget || 0) - totalReceived;
@@ -192,7 +193,13 @@ export default function ClientDetail() {
         >
           ← Back
         </button>
-        <h1 className="text-lg font-bold">{client.name}</h1>
+        <h1 className="text-lg font-bold flex-1">{client.name}</h1>
+        <button
+          onClick={handleEdit}
+          className="bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+        >
+          Edit Client
+        </button>
       </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
