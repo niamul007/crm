@@ -1,3 +1,11 @@
+/**
+ * Dashboard.jsx — main landing page after login
+ * - Fetches all clients belonging to the logged-in user
+ * - Displays summary stats: total clients, active projects, total budget
+ * - onDelete handles client deletion and updates local state without re-fetch
+ * - ClientCard receives onDelete as prop to handle delete button clicks
+ */
+
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -10,7 +18,7 @@ export default function Dashboard() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // YOU WRITE THIS
+  // Fetch all clients for the logged-in user on mount
   useEffect(() => {
     const fetchClient = async () => {
       if (!user?.id) {
@@ -18,13 +26,11 @@ export default function Dashboard() {
         return;
       }
       setLoading(true);
-
       try {
         const res = await API.get("/api/clients");
-        console.log(res.data);
         setClients(res.data?.data?.clients || []);
       } catch (error) {
-        console.log("failed to fetch", error);
+        console.error("Failed to fetch clients", error);
       } finally {
         setLoading(false);
       }
@@ -32,15 +38,18 @@ export default function Dashboard() {
     fetchClient();
   }, [user?.id]);
 
-  // YOU WRITE THIS
+  // Clear auth state and redirect to login
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
-  const totalBudget = clients.reduce((sum, c) => sum + parseFloat(c.budget), 0);
+  const totalBudget = clients.reduce(
+    (sum, c) => sum + (parseFloat(c.budget) || 0),
+    0
+  );
   const activeProjects = clients.filter(
-    (c) => c.project_status === "in-progress",
+    (c) => c.project_status === "in-progress"
   ).length;
 
   const onDelete = async (id) => {
@@ -49,7 +58,7 @@ export default function Dashboard() {
       await API.delete(`/api/clients/${id}`);
       setClients(clients.filter((c) => c.id !== id));
     } catch (error) {
-      console.log("Failed to delete client", error);
+      console.error("Failed to delete client", error);
     }
   };
 
