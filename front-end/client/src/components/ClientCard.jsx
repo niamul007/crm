@@ -1,8 +1,14 @@
-import { useNavigate } from "react-router-dom";
+/**
+ * ClientCard.jsx — displays a single client summary on the dashboard
+ * - Clicking the card navigates to /clients/:id (detail view)
+ * - onDelete is passed from Dashboard to handle client deletion
+ * - e.stopPropagation() on delete button prevents the card's
+ *   onClick from firing when delete is clicked
+ */
 
+import { useNavigate } from "react-router-dom";
 export default function ClientCard({ client , onDelete}) {
   const navigate = useNavigate();
-
   return (
 <div
   onClick={() => navigate(`/clients/${client.id}`)}
@@ -25,7 +31,7 @@ export default function ClientCard({ client , onDelete}) {
           e.stopPropagation();
           onDelete(client.id);
         }}
-        className="text-slate-500 hover:text-red-400 border border-slate-700 hover:border-red-400/50 text-xs px-3 py-1 rounded-lg transition"
+        className="text-slate-500 hover:text-red-400 border border-slate-700 hover:border-red-400/50 text-xs px-3 py-1 rounded-lg transition cursor-pointer"
       >
         Delete
       </button>
