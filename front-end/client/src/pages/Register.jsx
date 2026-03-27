@@ -1,3 +1,10 @@
+/**
+ * Register.jsx
+ * - Client-side password match validation before API call
+ * - On success → redirects to /login
+ * - On failure → shows backend error message
+ */
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../api/axios";
@@ -15,16 +22,18 @@ export default function Register() {
   });
 
   const { username, email, password, confirmPassword } = formData;
-  const onChnage = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const onChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   // YOU WRITE THIS FUNCTION
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    if (password !== confirmPassword)
-      return setError("Passwords do not match.");
-
+    if (password !== confirmPassword){
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    } 
     try {
       await API.post("/api/auth/register", { username, email, password });
       navigate("/login");
@@ -63,7 +72,7 @@ export default function Register() {
                 type="text"
                 value={username}
                 name="username"
-                onChange={onChnage}
+                onChange={onChange}
                 placeholder="yourname"
                 className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-3 text-sm placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition"
               />
@@ -77,7 +86,7 @@ export default function Register() {
                 type="email"
                 value={email}
                 name="email"
-                onChange={onChnage}
+                onChange={onChange}
                 placeholder="you@example.com"
                 className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-3 text-sm placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition"
               />
@@ -91,7 +100,7 @@ export default function Register() {
                 type="password"
                 value={password}
                 name="password"
-                onChange={onChnage}
+                onChange={onChange}
                 placeholder="••••••••"
                 className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-3 text-sm placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition"
               />
@@ -104,7 +113,7 @@ export default function Register() {
                 type="password"
                 value={confirmPassword}
                 name="confirmPassword"
-                onChange={onChnage}
+                onChange={onChange}
                 placeholder="••••••••"
                 className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-3 text-sm placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition"
               />
@@ -120,7 +129,8 @@ export default function Register() {
           </div>
 
           <p className="text-center text-slate-500 text-sm mt-6">
-            Already have an account?{" "}
+            Already have an account?{" "} 
+            {/* //why {" "} is this here? it's just a space character to ensure there's a space between the text and the link. */}
             <Link to="/login" className="text-blue-400 hover:text-blue-300">
               Sign in
             </Link>
