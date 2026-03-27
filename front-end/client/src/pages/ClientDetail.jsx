@@ -1,7 +1,22 @@
+/**
+ * ClientDetail.jsx — full client view with payments and notes
+ * - formatClientData() de-duplicates JOIN rows into clean object
+ * - All mutations (add/delete) re-fetch full client to stay in sync
+ * - handleEdit passes client data via location.state to ClientForm
+ * - totalReceived and remaining calculated on frontend from payments[]
+ */
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/axios";
 
+/**
+ * formatClientData — transforms raw JOIN rows into a clean client object
+ * The backend LEFT JOIN returns one row per payment+note combination,
+ * so the same client info repeats across multiple rows.
+ * We use Set to track seen IDs and avoid pushing duplicates
+ * into payments[] and notes[]
+ */
 const formatClientData = (rows) => {
   if (!rows || rows.length === 0) return null;
 
@@ -59,7 +74,7 @@ export default function ClientDetail() {
   // Note form state
   const [noteContent, setNoteContent] = useState("");
 
-  // YOU WRITE THIS — fetch client by id
+  // Fetch full client data including payments and notes on mount
   useEffect(() => {
     const fetchClient = async () => {
       if (!id) {
@@ -67,7 +82,6 @@ export default function ClientDetail() {
         return;
       }
       setLoading(true);
-
       try {
         const res = await API.get(`/api/clients/${id}`);
         setClient(formatClientData(res.data?.data?.getClients));
@@ -80,12 +94,9 @@ export default function ClientDetail() {
     fetchClient();
   }, [id]);
 
-  // YOU WRITE THIS — add payment
+  // Add payment and re-fetch to update UI
   const handleAddPayment = async () => {
-    if (!id) {
-      setLoading(false);
-      throw new Error("Id isn't avaible");
-    }
+    if (!id) throw new Error("Id isn't available");
     setLoading(true);
     try {
       await API.post(`/api/clients/${id}/payments`, {
@@ -93,7 +104,6 @@ export default function ClientDetail() {
         payment_date: paymentDate,
         payment_note: paymentNote,
       });
-      // re-fetch full client
       const updated = await API.get(`/api/clients/${id}`);
       setClient(formatClientData(updated.data?.data?.getClients));
       setPaymentAmount("");
@@ -101,37 +111,30 @@ export default function ClientDetail() {
       setPaymentNote("");
     } catch (error) {
       console.error(error.message);
-      console.log("PAYMENT ERROR:", error.response?.data);
     } finally {
       setLoading(false);
     }
   };
 
-  // YOU WRITE THIS — add note
+  // Add note and re-fetch to update UI
   const handleAddNote = async () => {
-    if (!id) {
-      throw new Error("Id isn't valid");
-    }
+    if (!id) throw new Error("Id isn't valid");
     setLoading(true);
     try {
       await API.post(`/api/clients/${id}/notes`, { content: noteContent });
       const updated = await API.get(`/api/clients/${id}`);
       setClient(formatClientData(updated.data?.data?.getClients));
       setNoteContent("");
-      console.log("ID from params:", id);
     } catch (error) {
       console.error(error.message);
-      console.log("PAYMENT ERROR:", error.response?.data);
     } finally {
       setLoading(false);
     }
   };
 
-  // YOU WRITE THIS — delete payment
+  // Delete payment and re-fetch to update UI
   const handleDeletePayment = async (paymentId) => {
-    if (!paymentId) {
-      throw new Error("Id isn't valid");
-    }
+    if (!paymentId) throw new Error("Id isn't valid");
     setLoading(true);
     try {
       await API.delete(`/api/clients/${id}/payments/${paymentId}`);
@@ -144,12 +147,9 @@ export default function ClientDetail() {
     }
   };
 
-  // YOU WRITE THIS — delete note
+  // Delete note and re-fetch to update UI
   const handleDeleteNote = async (noteId) => {
-    if (!noteId) {
-      setLoading(false);
-      throw new Error("Id isn't valid");
-    }
+    if (!noteId) throw new Error("Id isn't valid");
     setLoading(true);
     try {
       await API.delete(`/api/clients/${id}/notes/${noteId}`);
@@ -161,10 +161,13 @@ export default function ClientDetail() {
       setLoading(false);
     }
   };
-  const handleEdit = ()=>{
-    navigate(`/clients/${id}/edit`,{ state: { client } });
 
-  }
+  // Navigate to edit form, passing current client data via location.state
+  const handleEdit = () => {
+    navigate(`/clients/${id}/edit`, { state: { client } });
+  };
+
+  // Remaining balance calculated on frontend — budget is stored, balance is derived
   const totalReceived =
     client?.payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
   const remaining = parseFloat(client?.budget || 0) - totalReceived;
@@ -189,14 +192,14 @@ export default function ClientDetail() {
       <nav className="border-b border-slate-800 px-6 py-4 flex items-center gap-4">
         <button
           onClick={() => navigate("/dashboard")}
-          className="text-slate-400 hover:text-white transition text-sm"
+          className="text-slate-400 hover:text-white transition text-sm cursor-pointer"
         >
           ← Back
         </button>
         <h1 className="text-lg font-bold flex-1">{client.name}</h1>
         <button
           onClick={handleEdit}
-          className="bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+          className="bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition cursor-pointer"
         >
           Edit Client
         </button>
@@ -211,15 +214,11 @@ export default function ClientDetail() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-xs text-slate-500">Project</p>
-              <p className="text-white font-medium mt-1">
-                {client.project_name}
-              </p>
+              <p className="text-white font-medium mt-1">{client.project_name}</p>
             </div>
             <div>
               <p className="text-xs text-slate-500">Status</p>
-              <p className="text-white font-medium mt-1 capitalize">
-                {client.project_status}
-              </p>
+              <p className="text-white font-medium mt-1 capitalize">{client.project_status}</p>
             </div>
             <div>
               <p className="text-xs text-slate-500">Deadline</p>
@@ -266,8 +265,6 @@ export default function ClientDetail() {
           <h2 className="text-sm font-medium text-slate-400 uppercase tracking-wider mb-4">
             Payments
           </h2>
-
-          {/* Add Payment Form */}
           <div className="grid grid-cols-3 gap-3 mb-4">
             <input
               type="number"
@@ -292,12 +289,10 @@ export default function ClientDetail() {
           </div>
           <button
             onClick={handleAddPayment}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition mb-4"
+            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition mb-4 cursor-pointer"
           >
             + Add Payment
           </button>
-
-          {/* Payment List */}
           {client.payments.length === 0 ? (
             <p className="text-slate-500 text-sm">No payments yet.</p>
           ) : (
@@ -318,7 +313,7 @@ export default function ClientDetail() {
                   </div>
                   <button
                     onClick={() => handleDeletePayment(payment.id)}
-                    className="text-slate-500 hover:text-red-400 text-sm transition"
+                    className="text-slate-500 hover:text-red-400 text-sm transition cursor-pointer"
                   >
                     Delete
                   </button>
@@ -333,8 +328,6 @@ export default function ClientDetail() {
           <h2 className="text-sm font-medium text-slate-400 uppercase tracking-wider mb-4">
             Notes
           </h2>
-
-          {/* Add Note Form */}
           <div className="flex gap-3 mb-4">
             <input
               type="text"
@@ -345,13 +338,11 @@ export default function ClientDetail() {
             />
             <button
               onClick={handleAddNote}
-              className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+              className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition cursor-pointer"
             >
               + Add
             </button>
           </div>
-
-          {/* Note List */}
           {client.notes.length === 0 ? (
             <p className="text-slate-500 text-sm">No notes yet.</p>
           ) : (
@@ -364,7 +355,7 @@ export default function ClientDetail() {
                   <p className="text-slate-300 text-sm">{note.content}</p>
                   <button
                     onClick={() => handleDeleteNote(note.id)}
-                    className="text-slate-500 hover:text-red-400 text-sm transition ml-4"
+                    className="text-slate-500 hover:text-red-400 text-sm transition cursor-pointer ml-4"
                   >
                     Delete
                   </button>
