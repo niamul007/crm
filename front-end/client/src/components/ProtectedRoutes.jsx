@@ -1,3 +1,10 @@
+// so what does this files do is it checks if the user is authenticated 
+// before allowing access to certain routes.
+//  If the user is not authenticated, it redirects them to
+//  the login page. If the authentication status is still being dete
+// rmined (loading), it shows a loading spinner.
+
+
 import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
