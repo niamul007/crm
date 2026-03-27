@@ -110,7 +110,7 @@ export default function Dashboard() {
           <h2 className="text-xl font-bold">Your Clients</h2>
           <button
             onClick={() => navigate("/clients/new")}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition cursor-pointer "
           >
             + Add Client
           </button>
